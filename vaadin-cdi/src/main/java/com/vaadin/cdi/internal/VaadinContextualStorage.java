@@ -28,4 +28,14 @@ public class VaadinContextualStorage extends ContextualStorage {
         }
     }
 
+    @Override
+    public Contextual<?> getBean(Object beanKey) {
+        if (beanKey instanceof String) {
+            final UIBean uiBean = UIBean.recover((String) beanKey, this);
+            if (uiBean != null) {
+                return uiBean;
+            }
+        }
+        return super.getBean(beanKey);
+    }
 }

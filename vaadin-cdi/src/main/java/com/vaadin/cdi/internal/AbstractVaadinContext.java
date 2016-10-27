@@ -211,7 +211,9 @@ public abstract class AbstractVaadinContext extends AbstractContext {
             Contextual<?> key = entry.getKey();
             if (key instanceof UIContextual
                     && ((UIContextual) key).getUiId() == uiId) {
-                destroy(entry.getKey());
+                final ContextualStorage contextualStorage = entry.getValue();
+                destroyAllActive(contextualStorage);
+                sessionData.storageMap.remove(key);
             }
         }
         sessionData.uiDataMap.remove(uiId);
