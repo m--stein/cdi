@@ -38,12 +38,14 @@ public class UIDestroyTest extends AbstractManagedCDIIntegrationTest {
         Thread.sleep(5000); //AbstractVaadinContext.CLEANUP_DELAY
         //still have 2 UIs
         assertThat(DestroyUI.getNumberOfInstances(), is(2));
+        assertThat(DestroyUI.UIScopedBean.getNumberOfInstances(), is(2));
 
         //ViewChange event triggers a cleanup
         firstWindow.findElement(By.id(DestroyUI.NAVIGATE_BTN_ID)).click();
         waitForValue(LABEL, DestroyUI.NAVIGATE_BTN_ID);
 
         assertThat(DestroyUI.getNumberOfInstances(), is(1));
+        assertThat(DestroyUI.UIScopedBean.getNumberOfInstances(), is(1));
     }
 
 }
