@@ -24,28 +24,34 @@ public class UIDestroyTest extends AbstractManagedCDIIntegrationTest {
     @Test
     @OperateOnDeployment("uiDestroy")
     public void testViewChangeTriggersCleanup() throws Exception {
-        DestroyUI.resetCounter();
-        assertThat(DestroyUI.getNumberOfInstances(), is(0));
         String uri = Conventions.deriveMappingForUI(DestroyUI.class);
 
         openWindow(uri);
-        //close first UI, wait for response
-        firstWindow.findElement(By.id(DestroyUI.CLOSE_BTN_ID)).click();
-        waitForValue(LABEL, DestroyUI.CLOSE_BTN_ID);
+        assertInstanceCounts("1");
+
+        //close first UI
+        clickAndWait(DestroyUI.CLOSE_BTN_ID);
+
         //open new UI
         openWindow(uri);
+        assertInstanceCounts("2");
 
         Thread.sleep(5000); //AbstractVaadinContext.CLEANUP_DELAY
-        //still have 2 UIs
-        assertThat(DestroyUI.getNumberOfInstances(), is(2));
-        assertThat(DestroyUI.UIScopedBean.getNumberOfInstances(), is(2));
 
         //ViewChange event triggers a cleanup
-        firstWindow.findElement(By.id(DestroyUI.NAVIGATE_BTN_ID)).click();
-        waitForValue(LABEL, DestroyUI.NAVIGATE_BTN_ID);
+        clickAndWait(DestroyUI.NAVIGATE_BTN_ID);
 
-        assertThat(DestroyUI.getNumberOfInstances(), is(1));
-        assertThat(DestroyUI.UIScopedBean.getNumberOfInstances(), is(1));
+        //first UI cleaned up
+        assertInstanceCounts("1");
+    }
+
+    private void assertInstanceCounts(String count) {
+        clickAndWait(DestroyUI.QUERYCOUNT_BTN_ID);
+
+        String uicount = findElement(DestroyUI.UICOUNT_ID).getText();
+        String uibeancount = findElement(DestroyUI.UIBEANCOUNT_ID).getText();
+        assertThat(uicount, is(count));
+        assertThat(uibeancount, is(count));
     }
 
 }
