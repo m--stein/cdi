@@ -22,15 +22,15 @@ import java.util.Set;
 
 import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.PassivationCapable;
 
 import com.vaadin.ui.UI;
-import org.apache.deltaspike.core.util.context.ContextualStorage;
 
 public class UIBean extends UIContextual implements Bean, PassivationCapable {
 
-    private static final String PASSIVATION_ID_PREFIX = "com.vaadin.cdi.internal.UIBean";
+    private static final String PASSIVATION_ID_PREFIX = "com.vaadin.cdi.internal.UIBean#";
 
     public UIBean(Bean delegate, long sessionId, int uiId) {
         super(delegate, sessionId, uiId);
@@ -106,7 +106,6 @@ public class UIBean extends UIContextual implements Bean, PassivationCapable {
     @Override
     public String getId() {
         StringBuilder sb = new StringBuilder(PASSIVATION_ID_PREFIX);
-        sb.append("#");
         sb.append(sessionId);
         sb.append("#");
         sb.append(uiId);
@@ -132,14 +131,16 @@ public class UIBean extends UIContextual implements Bean, PassivationCapable {
         return sb.toString();
     }
 
-    public static UIBean recover(String passivationId, ContextualStorage contextualStorage) {
-        final String[] idParts = passivationId.split("#", 4);
-        if (idParts.length == 4 && PASSIVATION_ID_PREFIX.equals(idParts[0])) {
-            Contextual<?> delegate = contextualStorage.getBean(idParts[3]);
-            if (delegate instanceof Bean) {
-                long sessionId = Long.parseLong(idParts[1]);
-                int uiId = Integer.parseInt(idParts[2]);
-                return new UIBean((Bean)delegate, sessionId, uiId);
+    public static UIBean recover(String passivationId, BeanManager beanManager) {
+        if (passivationId.startsWith(PASSIVATION_ID_PREFIX)) {
+            final String[] idParts = passivationId.split("#", 4);
+            if (idParts.length == 4) {
+                Contextual<?> delegate = beanManager.getPassivationCapableBean(idParts[3]);
+                if (delegate instanceof Bean) {
+                    long sessionId = Long.parseLong(idParts[1]);
+                    int uiId = Integer.parseInt(idParts[2]);
+                    return new UIBean((Bean)delegate, sessionId, uiId);
+                }
             }
         }
         return null;
