@@ -1,10 +1,9 @@
 package com.vaadin.cdi.uis;
 
-import com.vaadin.cdi.CDIUI;
-import com.vaadin.cdi.CDIViewProvider;
-import com.vaadin.cdi.UIScoped;
+import com.vaadin.cdi.*;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Button;
@@ -18,35 +17,19 @@ import javax.inject.Inject;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@CDIUI("uiDestroy")
-public class DestroyUI extends UI {
-    private final static AtomicInteger COUNTER = new AtomicInteger(0);
-
+@CDIUI("viewDestroy")
+public class DestroyViewUI extends UI {
     public static final String CLOSE_BTN_ID = "close";
     public static final String QUERYCOUNT_BTN_ID = "guerycount";
-    public static final String NAVIGATE_BTN_ID = "navigate";
     public static final String LABEL_ID = "label";
-    public static final String UICOUNT_ID = "uicount";
-    public static final String UIBEANCOUNT_ID = "uibeancount";
+    public static final String VIEWCOUNT_ID = "viewcount";
+    public static final String VIEWBEANCOUNT_ID = "viewbeancount";
 
     @Inject
     CDIViewProvider viewProvider;
 
-    @Inject
-    UIScopedBean bean;
-
-    @PostConstruct
-    public void initialize() {
-        COUNTER.incrementAndGet();
-    }
-
-    @PreDestroy
-    public void destroy() {
-        COUNTER.decrementAndGet();
-    }
-
     @Override
-    protected void init(VaadinRequest request) {
+    protected void init(VaadinRequest vaadinRequest) {
         setSizeFull();
 
         VerticalLayout layout = new VerticalLayout();
@@ -55,14 +38,6 @@ public class DestroyUI extends UI {
         final Label label = new Label("label");
         label.setId(LABEL_ID);
         layout.addComponent(label);
-
-        final Label uicount = new Label();
-        uicount.setId(UICOUNT_ID);
-        layout.addComponent(uicount);
-
-        final Label uibeancount = new Label();
-        uibeancount.setId(UIBEANCOUNT_ID);
-        layout.addComponent(uibeancount);
 
         Button closeBtn = new Button("close UI");
         closeBtn.setId(CLOSE_BTN_ID);
@@ -74,48 +49,66 @@ public class DestroyUI extends UI {
         });
         layout.addComponent(closeBtn);
 
+        final Label viewcount = new Label();
+        viewcount.setId(VIEWCOUNT_ID);
+        layout.addComponent(viewcount);
+
+        final Label viewbeancount = new Label();
+        viewbeancount.setId(VIEWBEANCOUNT_ID);
+        layout.addComponent(viewbeancount);
+
         Button queryCountBtn = new Button("query count");
         queryCountBtn.setId(QUERYCOUNT_BTN_ID);
         queryCountBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                updateCounts(uicount, uibeancount);
+                viewcount.setValue(Integer.toString(HomeView.getNumberOfInstances()));
+                viewbeancount.setValue(Integer.toString(ViewScopedBean.getNumberOfInstances()));
             }
         });
         layout.addComponent(queryCountBtn);
 
-        Button viewNavigateBtn = new Button("navigate");
-        viewNavigateBtn.setId(NAVIGATE_BTN_ID);
-        viewNavigateBtn.addClickListener(new Button.ClickListener() {
+        final Navigator navigator = new Navigator(this, new ViewDisplay() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
-                final Navigator navigator = new Navigator(DestroyUI.this, new ViewDisplay() {
-                    @Override
-                    public void showView(View view) {
-                    }
-                });
-                navigator.addProvider(viewProvider);
-                navigator.navigateTo("scopedInstrumentedView");
+            public void showView(View view) {
             }
         });
-        layout.addComponent(viewNavigateBtn);
+        navigator.addProvider(viewProvider);
 
         setContent(layout);
-
     }
 
-    private void updateCounts(Label uicount, Label uibeancount) {
-        uicount.setValue(Integer.toString(getNumberOfInstances()));
-        uibeancount.setValue(Integer.toString(UIScopedBean.getNumberOfInstances()));
-    }
-
-    public static int getNumberOfInstances() {
-        return COUNTER.get();
-    }
-
-    @UIScoped
-    public static class UIScopedBean implements Serializable {
+    @CDIView(value = "home")
+    public static class HomeView extends VerticalLayout implements View {
         private final static AtomicInteger COUNTER = new AtomicInteger(0);
+
+        @Inject
+        ViewScopedBean viewScopedBean;
+
+        @PostConstruct
+        public void initialize() {
+            COUNTER.incrementAndGet();
+        }
+
+        @PreDestroy
+        public void destroy() {
+            COUNTER.decrementAndGet();
+        }
+
+        public static int getNumberOfInstances() {
+            return COUNTER.get();
+        }
+
+        @Override
+        public void enter(ViewChangeListener.ViewChangeEvent viewChangeEvent) {
+
+        }
+    }
+
+    @ViewScoped
+    public static class ViewScopedBean implements Serializable {
+        private final static AtomicInteger COUNTER = new AtomicInteger(0);
+
 
         @PostConstruct
         public void initialize() {
@@ -132,5 +125,6 @@ public class DestroyUI extends UI {
         }
 
     }
+
 
 }
