@@ -33,16 +33,9 @@ public class VaadinContextualStorage extends ContextualStorage {
     @Override
     public Contextual<?> getBean(Object beanKey) {
         if (beanKey instanceof String) {
-            String passivationId = (String) beanKey;
-            final UIBean uiBean = UIBean.recover(passivationId, beanManager);
-            if (uiBean != null) {
-                return uiBean;
-            }
-            final ViewBean viewBean = ViewBean.recover(passivationId, beanManager);
-            if (viewBean != null) {
-                return viewBean;
-            }
+            return beanManager.getPassivationCapableBean((String) beanKey);
+        } else {
+            return (Contextual<?>) beanKey;
         }
-        return super.getBean(beanKey);
     }
 }
