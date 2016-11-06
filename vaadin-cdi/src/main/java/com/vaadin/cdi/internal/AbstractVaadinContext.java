@@ -34,13 +34,6 @@ import com.vaadin.cdi.internal.AbstractVaadinContext.SessionData.UIData;
 import com.vaadin.server.VaadinSession;
 
 /**
- * Failed tests:   testUIInjection(com.vaadin.cdi.InjectionTest):
- initAndPostConstructInjectionsAreConsistent(com.vaadin.cdi.ConsistentInjectionTest):
- testViewChangeTriggersCleanup(com.vaadin.cdi.UIDestroyTest):
- injectedBeanDependsOnSessionTest(com.vaadin.cdi.MultipleSessionTest):
- */
-
-/**
  * UIScopedContext is the context for @UIScoped beans.
  */
 public abstract class AbstractVaadinContext extends AbstractContext {
