@@ -18,8 +18,7 @@ public class UIDestroyTest extends AbstractManagedCDIIntegrationTest {
     public static WebArchive deployment() {
         return ArchiveProvider.createWebArchive("uiDestroy",
                 DestroyUI.class,
-                ScopedInstrumentedView.class,
-                DestroyViewUI.class);
+                ScopedInstrumentedView.class);
     }
 
     @Test
@@ -44,31 +43,6 @@ public class UIDestroyTest extends AbstractManagedCDIIntegrationTest {
 
         //first UI cleaned up
         assertUiInstanceCounts("1");
-    }
-
-    @Test
-    @OperateOnDeployment("uiDestroy")
-    public void testViewDestroyOnUIDestroy() throws Exception {
-        String viewUri = Conventions.deriveMappingForUI(DestroyViewUI.class)+ "#!home";
-
-        openWindow(viewUri);
-        clickAndWait(DestroyViewUI.CLOSE_BTN_ID);
-        openWindow(viewUri);
-        assertViewInstanceCounts("2");
-
-        clickAndWait(DestroyViewUI.CLOSE_BTN_ID);
-        Thread.sleep(5000); //AbstractVaadinContext.CLEANUP_DELAY
-
-        //open new UI. Navigating to home view on load triggers cleanup.
-        openWindow(viewUri);
-
-        assertViewInstanceCounts("1");
-    }
-
-    private void assertViewInstanceCounts(String count) {
-        clickAndWait(DestroyViewUI.QUERYCOUNT_BTN_ID);
-        assertThat(findElement(DestroyViewUI.VIEWCOUNT_ID).getText(), is(count));
-        assertThat(findElement(DestroyViewUI.VIEWBEANCOUNT_ID).getText(), is(count));
     }
 
     private void assertUiInstanceCounts(String count) {

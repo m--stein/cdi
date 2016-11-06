@@ -24,9 +24,12 @@ public class DestroyViewUI extends UI {
     public static final String LABEL_ID = "label";
     public static final String VIEWCOUNT_ID = "viewcount";
     public static final String VIEWBEANCOUNT_ID = "viewbeancount";
+    public static final String NAVIGATE_BTN_ID = "navigate";
 
     @Inject
     CDIViewProvider viewProvider;
+    private Label viewcount;
+    private Label viewbeancount;
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
@@ -49,11 +52,11 @@ public class DestroyViewUI extends UI {
         });
         layout.addComponent(closeBtn);
 
-        final Label viewcount = new Label();
+        viewcount = new Label();
         viewcount.setId(VIEWCOUNT_ID);
         layout.addComponent(viewcount);
 
-        final Label viewbeancount = new Label();
+        viewbeancount = new Label();
         viewbeancount.setId(VIEWBEANCOUNT_ID);
         layout.addComponent(viewbeancount);
 
@@ -62,8 +65,7 @@ public class DestroyViewUI extends UI {
         queryCountBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                viewcount.setValue(Integer.toString(HomeView.getNumberOfInstances()));
-                viewbeancount.setValue(Integer.toString(ViewScopedBean.getNumberOfInstances()));
+                updateCounts();
             }
         });
         layout.addComponent(queryCountBtn);
@@ -75,11 +77,26 @@ public class DestroyViewUI extends UI {
         });
         navigator.addProvider(viewProvider);
 
+        Button viewNavigateBtn = new Button("navigate");
+        viewNavigateBtn.setId(NAVIGATE_BTN_ID);
+        viewNavigateBtn.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                navigator.navigateTo("other");
+            }
+        });
+        layout.addComponent(viewNavigateBtn);
+
         setContent(layout);
     }
 
+    private void updateCounts() {
+        viewcount.setValue(Integer.toString(HomeView.getNumberOfInstances()));
+        viewbeancount.setValue(Integer.toString(ViewScopedBean.getNumberOfInstances()));
+    }
+
     @CDIView(value = "home")
-    public static class HomeView extends VerticalLayout implements View {
+    public static class HomeView implements View {
         private final static AtomicInteger COUNTER = new AtomicInteger(0);
 
         @Inject
@@ -109,7 +126,6 @@ public class DestroyViewUI extends UI {
     public static class ViewScopedBean implements Serializable {
         private final static AtomicInteger COUNTER = new AtomicInteger(0);
 
-
         @PostConstruct
         public void initialize() {
             COUNTER.incrementAndGet();
@@ -124,6 +140,15 @@ public class DestroyViewUI extends UI {
             return COUNTER.get();
         }
 
+    }
+
+    @CDIView("other")
+    public static class OtherView implements View {
+
+        @Override
+        public void enter(ViewChangeListener.ViewChangeEvent event) {
+
+        }
     }
 
 
