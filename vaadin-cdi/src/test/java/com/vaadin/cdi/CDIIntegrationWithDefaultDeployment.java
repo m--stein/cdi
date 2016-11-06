@@ -62,6 +62,8 @@ import com.vaadin.cdi.uis.WithAnnotationRegisteredView;
 import com.vaadin.cdi.views.ConventionalView;
 import com.vaadin.cdi.views.MainView;
 import com.vaadin.cdi.views.SubView;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class CDIIntegrationWithDefaultDeployment extends
         AbstractManagedCDIIntegrationTest {
@@ -202,7 +204,7 @@ public class CDIIntegrationWithDefaultDeployment extends
             throws MalformedURLException {
         openWindow(INSTRUMENTED_UI_URI);
         assertThat(InstrumentedUI.getNumberOfInstances(), is(1));
-        firstWindow.navigate().refresh();
+        refreshWindow();
         assertThat(InstrumentedUI.getNumberOfInstances(), is(2));
         assertDefaultRootNotInstantiated();
     }

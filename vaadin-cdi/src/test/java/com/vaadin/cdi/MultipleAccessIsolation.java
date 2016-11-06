@@ -73,7 +73,7 @@ public class MultipleAccessIsolation extends
         Thread.sleep(100);
         assertThat(firstWindow.findElement(By.id(ConcurrentUI.COUNTER_LABEL))
                 .getText(), is("1"));
-        firstWindow.navigate().refresh();
+        refreshWindow();
         (new WebDriverWait(firstWindow, 15)).until(ExpectedConditions
                 .presenceOfElementLocated(LABEL));
         assertThat(firstWindow.findElement(By.id(ConcurrentUI.COUNTER_LABEL))
