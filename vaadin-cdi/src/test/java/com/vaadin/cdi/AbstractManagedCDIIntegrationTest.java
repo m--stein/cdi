@@ -74,6 +74,10 @@ public abstract class AbstractManagedCDIIntegrationTest extends
                 });
     }
 
+    public void resetCounts() throws MalformedURLException {
+        openWindowNoWait("?resetCounts");
+    }
+
     public void clickAndWait(String id) {
         findElement(id).click();
         waitForClient();
