@@ -1,6 +1,7 @@
 package com.vaadin.cdi.uis;
 
 import com.vaadin.cdi.*;
+import com.vaadin.cdi.internal.Counter;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -11,11 +12,9 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @CDIUI("viewDestroy")
 public class DestroyViewUI extends UI {
@@ -28,6 +27,8 @@ public class DestroyViewUI extends UI {
 
     @Inject
     CDIViewProvider viewProvider;
+    @Inject
+    Counter counter;
     private Label viewcount;
     private Label viewbeancount;
 
@@ -91,29 +92,21 @@ public class DestroyViewUI extends UI {
     }
 
     private void updateCounts() {
-        viewcount.setValue(Integer.toString(HomeView.getNumberOfInstances()));
-        viewbeancount.setValue(Integer.toString(ViewScopedBean.getNumberOfInstances()));
+        viewcount.setValue(Integer.toString(counter.get("HomeViewDestroy")));
+        viewbeancount.setValue(Integer.toString(counter.get("ViewScopedBeanDestroy")));
     }
 
     @CDIView(value = "home")
     public static class HomeView implements View {
-        private final static AtomicInteger COUNTER = new AtomicInteger(0);
-
         @Inject
         ViewScopedBean viewScopedBean;
 
-        @PostConstruct
-        public void initialize() {
-            COUNTER.incrementAndGet();
-        }
+        @Inject
+        Counter counter;
 
         @PreDestroy
         public void destroy() {
-            COUNTER.decrementAndGet();
-        }
-
-        public static int getNumberOfInstances() {
-            return COUNTER.get();
+            counter.increment("HomeViewDestroy");
         }
 
         @Override
@@ -124,21 +117,14 @@ public class DestroyViewUI extends UI {
 
     @ViewScoped
     public static class ViewScopedBean implements Serializable {
-        private final static AtomicInteger COUNTER = new AtomicInteger(0);
-
-        @PostConstruct
-        public void initialize() {
-            COUNTER.incrementAndGet();
-        }
+        @Inject
+        Counter counter;
 
         @PreDestroy
         public void destroy() {
-            COUNTER.decrementAndGet();
+            counter.increment("ViewScopedBeanDestroy");
         }
 
-        public static int getNumberOfInstances() {
-            return COUNTER.get();
-        }
 
     }
 
