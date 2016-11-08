@@ -23,7 +23,12 @@ public class CounterFilter implements javax.servlet.Filter {
         if (request.getParameter("resetCounts") != null) {
             counter.reset();
         } else {
-            chain.doFilter(request, response);
+            String key = request.getParameter("getCount");
+            if (key != null) {
+                response.getWriter().println(counter.get(key));
+            } else {
+                chain.doFilter(request, response);
+            }
         }
     }
 
