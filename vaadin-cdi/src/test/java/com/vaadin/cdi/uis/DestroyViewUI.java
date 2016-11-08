@@ -19,18 +19,15 @@ import java.io.Serializable;
 @CDIUI("viewDestroy")
 public class DestroyViewUI extends UI {
     public static final String CLOSE_BTN_ID = "close";
-    public static final String QUERYCOUNT_BTN_ID = "guerycount";
     public static final String LABEL_ID = "label";
-    public static final String VIEWCOUNT_ID = "viewcount";
-    public static final String VIEWBEANCOUNT_ID = "viewbeancount";
+    public static final String VIEW_DESTROY_COUNT_KEY = "viewcount";
+    public static final String VIEWBEAN_DESTROY_COUNT_KEY = "viewbeancount";
     public static final String NAVIGATE_BTN_ID = "navigate";
 
     @Inject
     CDIViewProvider viewProvider;
     @Inject
     Counter counter;
-    private Label viewcount;
-    private Label viewbeancount;
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
@@ -53,24 +50,6 @@ public class DestroyViewUI extends UI {
         });
         layout.addComponent(closeBtn);
 
-        viewcount = new Label();
-        viewcount.setId(VIEWCOUNT_ID);
-        layout.addComponent(viewcount);
-
-        viewbeancount = new Label();
-        viewbeancount.setId(VIEWBEANCOUNT_ID);
-        layout.addComponent(viewbeancount);
-
-        Button queryCountBtn = new Button("query count");
-        queryCountBtn.setId(QUERYCOUNT_BTN_ID);
-        queryCountBtn.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                updateCounts();
-            }
-        });
-        layout.addComponent(queryCountBtn);
-
         final Navigator navigator = new Navigator(this, new ViewDisplay() {
             @Override
             public void showView(View view) {
@@ -91,11 +70,6 @@ public class DestroyViewUI extends UI {
         setContent(layout);
     }
 
-    private void updateCounts() {
-        viewcount.setValue(Integer.toString(counter.get("HomeViewDestroy")));
-        viewbeancount.setValue(Integer.toString(counter.get("ViewScopedBeanDestroy")));
-    }
-
     @CDIView(value = "home")
     public static class HomeView implements View {
         @Inject
@@ -106,7 +80,7 @@ public class DestroyViewUI extends UI {
 
         @PreDestroy
         public void destroy() {
-            counter.increment("HomeViewDestroy");
+            counter.increment(VIEW_DESTROY_COUNT_KEY);
         }
 
         @Override
@@ -122,7 +96,7 @@ public class DestroyViewUI extends UI {
 
         @PreDestroy
         public void destroy() {
-            counter.increment("ViewScopedBeanDestroy");
+            counter.increment(VIEWBEAN_DESTROY_COUNT_KEY);
         }
 
 
