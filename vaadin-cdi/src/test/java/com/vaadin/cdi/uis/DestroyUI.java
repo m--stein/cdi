@@ -3,6 +3,7 @@ package com.vaadin.cdi.uis;
 import com.vaadin.cdi.CDIUI;
 import com.vaadin.cdi.CDIViewProvider;
 import com.vaadin.cdi.UIScoped;
+import com.vaadin.cdi.internal.Counter;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewDisplay;
@@ -35,14 +36,12 @@ public class DestroyUI extends UI {
     @Inject
     UIScopedBean bean;
 
-    @PostConstruct
-    public void initialize() {
-        COUNTER.incrementAndGet();
-    }
+    @Inject
+    Counter counter;
 
     @PreDestroy
     public void destroy() {
-        COUNTER.decrementAndGet();
+        counter.increment("UIDestroy");
     }
 
     @Override
@@ -105,32 +104,19 @@ public class DestroyUI extends UI {
     }
 
     private void updateCounts(Label uicount, Label uibeancount) {
-        uicount.setValue(Integer.toString(getNumberOfInstances()));
-        uibeancount.setValue(Integer.toString(UIScopedBean.getNumberOfInstances()));
-    }
-
-    public static int getNumberOfInstances() {
-        return COUNTER.get();
+        uicount.setValue(Integer.toString(counter.get("UIDestroy")));
+        uibeancount.setValue(Integer.toString(counter.get("UIScopedBeanDestroy")));
     }
 
     @UIScoped
     public static class UIScopedBean implements Serializable {
-        private final static AtomicInteger COUNTER = new AtomicInteger(0);
-
-        @PostConstruct
-        public void initialize() {
-            COUNTER.incrementAndGet();
-        }
+        @Inject
+        Counter counter;
 
         @PreDestroy
         public void destroy() {
-            COUNTER.decrementAndGet();
+            counter.increment("UIScopedBeanDestroy");
         }
-
-        public static int getNumberOfInstances() {
-            return COUNTER.get();
-        }
-
     }
 
 }

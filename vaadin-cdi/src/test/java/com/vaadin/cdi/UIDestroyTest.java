@@ -2,7 +2,6 @@ package com.vaadin.cdi;
 
 import com.vaadin.cdi.internal.Conventions;
 import com.vaadin.cdi.uis.DestroyUI;
-import com.vaadin.cdi.uis.DestroyViewUI;
 import com.vaadin.cdi.uis.ScopedInstrumentedView;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -24,17 +23,18 @@ public class UIDestroyTest extends AbstractManagedCDIIntegrationTest {
     @Test
     @OperateOnDeployment("uiDestroy")
     public void testViewChangeTriggersClosedUIDestroy() throws Exception {
+        resetCounts();
         String uri = Conventions.deriveMappingForUI(DestroyUI.class);
 
         openWindow(uri);
-        assertUiInstanceCounts("1");
+        assertUiDestroyCount("0");
 
         //close first UI
         clickAndWait(DestroyUI.CLOSE_BTN_ID);
 
         //open new UI
         openWindow(uri);
-        assertUiInstanceCounts("2");
+        assertUiDestroyCount("0");
 
         Thread.sleep(5000); //AbstractVaadinContext.CLEANUP_DELAY
 
@@ -42,10 +42,10 @@ public class UIDestroyTest extends AbstractManagedCDIIntegrationTest {
         clickAndWait(DestroyUI.NAVIGATE_BTN_ID);
 
         //first UI cleaned up
-        assertUiInstanceCounts("1");
+        assertUiDestroyCount("1");
     }
 
-    private void assertUiInstanceCounts(String count) {
+    private void assertUiDestroyCount(String count) {
         clickAndWait(DestroyUI.QUERYCOUNT_BTN_ID);
         assertThat(findElement(DestroyUI.UICOUNT_ID).getText(), is(count));
         assertThat(findElement(DestroyUI.UIBEANCOUNT_ID).getText(), is(count));
