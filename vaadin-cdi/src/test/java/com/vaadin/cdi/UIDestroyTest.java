@@ -48,8 +48,8 @@ public class UIDestroyTest extends AbstractManagedCDIIntegrationTest {
     }
 
     private void assertUiDestroyCount(int count) throws IOException {
-        assertThat(getCount(DestroyUI.UI_DESTROY_COUNT_KEY), is(count));
-        assertThat(getCount(DestroyUI.UIBEAN_DESTROY_COUNT_KEY), is(count));
+        assertThat(getCount(DestroyUI.DESTROY_COUNT), is(count));
+        assertThat(getCount(DestroyUI.UIScopedBean.DESTROY_COUNT), is(count));
     }
 
 }

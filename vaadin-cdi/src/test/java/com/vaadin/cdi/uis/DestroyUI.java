@@ -22,8 +22,7 @@ public class DestroyUI extends UI {
     public static final String CLOSE_BTN_ID = "close";
     public static final String NAVIGATE_BTN_ID = "navigate";
     public static final String LABEL_ID = "label";
-    public static final String UI_DESTROY_COUNT_KEY = "uicount";
-    public static final String UIBEAN_DESTROY_COUNT_KEY = "uibeancount";
+    public static final String DESTROY_COUNT = "uidestroycount";
 
     @Inject
     CDIViewProvider viewProvider;
@@ -36,7 +35,7 @@ public class DestroyUI extends UI {
 
     @PreDestroy
     public void destroy() {
-        counter.increment(UI_DESTROY_COUNT_KEY);
+        counter.increment(DESTROY_COUNT);
     }
 
     @Override
@@ -82,12 +81,14 @@ public class DestroyUI extends UI {
 
     @UIScoped
     public static class UIScopedBean implements Serializable {
+        public static final String DESTROY_COUNT = "uibeandestroycount";
+
         @Inject
         Counter counter;
 
         @PreDestroy
         public void destroy() {
-            counter.increment(UIBEAN_DESTROY_COUNT_KEY);
+            counter.increment(DESTROY_COUNT);
         }
     }
 
