@@ -11,14 +11,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Counter {
     ConcurrentHashMap<String, AtomicInteger> map = new ConcurrentHashMap<String, AtomicInteger>();
 
-    public void increment(String key) {
+    public int increment(String key) {
         map.putIfAbsent(key, new AtomicInteger(0));
-        map.get(key).incrementAndGet();
+        return map.get(key).incrementAndGet();
     }
 
-    public void decrement(String key) {
+    public int decrement(String key) {
         map.putIfAbsent(key, new AtomicInteger(0));
-        map.get(key).decrementAndGet();
+        return map.get(key).decrementAndGet();
     }
 
     public int get(String key) {
