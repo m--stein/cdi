@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 
 public class UIDestroyTest extends AbstractManagedCDIIntegrationTest {
 
-    @Deployment(name = "uiDestroy")
+    @Deployment(name = "uiDestroy", testable = false)
     public static WebArchive deployment() {
         return ArchiveProvider.createWebArchive("uiDestroy",
                 DestroyUI.class,
