@@ -15,23 +15,16 @@
  */
 package com.vaadin.cdi.internal;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
-
-import javax.enterprise.context.spi.Contextual;
-import javax.enterprise.inject.spi.BeanManager;
-
+import com.vaadin.server.VaadinSession;
 import org.apache.deltaspike.core.util.context.AbstractContext;
 import org.apache.deltaspike.core.util.context.ContextualStorage;
 
-import com.vaadin.cdi.internal.AbstractVaadinContext.SessionData.UIData;
-import com.vaadin.server.VaadinSession;
+import javax.enterprise.context.spi.Contextual;
+import javax.enterprise.inject.spi.BeanManager;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 /**
  * UIScopedContext is the context for @UIScoped beans.
@@ -249,9 +242,9 @@ public abstract class AbstractVaadinContext extends AbstractContext {
         SessionData sessionData = storageMap.remove(sessionId);
         if (sessionData != null) {
             synchronized (sessionData) {
-                Map<Integer, UIData> map = sessionData.getUiDataMap();
-                for (UIData uiData : new ArrayList<UIData>(map.values())) {
-                    dropUIData(sessionData, uiData.getUiId());
+                Collection<ContextualStorage> storages = sessionData.storageMap.values();
+                for (ContextualStorage storage : storages) {
+                    destroyAllActive(storage);
                 }
             }
         }
