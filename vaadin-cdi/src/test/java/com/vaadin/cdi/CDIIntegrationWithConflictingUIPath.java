@@ -16,7 +16,7 @@ public class CDIIntegrationWithConflictingUIPath extends
         AbstractCDIIntegrationTest {
 
 
-    @Deployment(name = "uiPathCollision", managed = false)
+    @Deployment(name = "uiPathCollision", managed = false, testable = false)
     public static WebArchive multipleUIsWithSamePath() {
         return ArchiveProvider.createWebArchive("uiPathCollision",
                 PathCollisionUI.class, AnotherPathCollisionUI.class);

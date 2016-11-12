@@ -1,25 +1,24 @@
 package com.vaadin.cdi;
 
-import static com.vaadin.cdi.internal.Conventions.deriveMappingForUI;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
-
+import com.vaadin.cdi.internal.CrossInjectingBean;
+import com.vaadin.cdi.uis.ParameterizedNavigationUI;
+import com.vaadin.cdi.views.CrossInjectingView;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.openqa.selenium.By;
 
-import com.vaadin.cdi.internal.CrossInjectingBean;
-import com.vaadin.cdi.uis.ParameterizedNavigationUI;
-import com.vaadin.cdi.views.CrossInjectingView;
-
 import java.net.MalformedURLException;
+
+import static com.vaadin.cdi.internal.Conventions.deriveMappingForUI;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertThat;
 
 public class CrossInjection extends AbstractManagedCDIIntegrationTest {
 
-    @Deployment(name = "crossInjection")
+    @Deployment(name = "crossInjection", testable = false)
     public static WebArchive crossInjectionArchive() {
         return ArchiveProvider.createWebArchive("crossInjection",
                 ParameterizedNavigationUI.class, CrossInjectingView.class,
