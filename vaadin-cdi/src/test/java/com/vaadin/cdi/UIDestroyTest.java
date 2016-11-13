@@ -4,7 +4,6 @@ import com.vaadin.cdi.internal.Conventions;
 import com.vaadin.cdi.uis.DestroyUI;
 import com.vaadin.cdi.uis.ScopedInstrumentedView;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +17,7 @@ public class UIDestroyTest extends AbstractManagedCDIIntegrationTest {
 
     private String uri;
 
-    @Deployment(name = "uiDestroy", testable = false)
+    @Deployment(testable = false)
     public static WebArchive deployment() {
         return ArchiveProvider.createWebArchive("uiDestroy",
                 DestroyUI.class,
@@ -29,13 +28,13 @@ public class UIDestroyTest extends AbstractManagedCDIIntegrationTest {
     public void setUp() throws IOException {
         resetCounts();
         uri = Conventions.deriveMappingForUI(DestroyUI.class);
+        firstWindow.manage().deleteAllCookies();//ensure test starts in a new session
 
         openWindow(uri);
         assertDestroyCount(0);
     }
 
     @Test
-    @OperateOnDeployment("uiDestroy")
     public void testViewChangeTriggersClosedUIDestroy() throws Exception {
         //close first UI
         clickAndWait(DestroyUI.CLOSE_BTN_ID);
