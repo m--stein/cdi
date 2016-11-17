@@ -24,6 +24,7 @@ public class DestroyUI extends UI {
     public static final String CLOSE_SESSION_BTN_ID = "close session";
     public static final String NAVIGATE_BTN_ID = "navigate";
     public static final String LABEL_ID = "label";
+    public static final String UIID_ID = "UIID";
     public static final String DESTROY_COUNT = "uidestroycount";
 
     @Inject
@@ -37,7 +38,7 @@ public class DestroyUI extends UI {
 
     @PreDestroy
     public void destroy() {
-        counter.increment(DESTROY_COUNT);
+        counter.increment(DESTROY_COUNT + getUIId());
     }
 
     @Override
@@ -50,6 +51,11 @@ public class DestroyUI extends UI {
         final Label label = new Label("label");
         label.setId(LABEL_ID);
         layout.addComponent(label);
+
+        bean.setUiId(getUIId());
+        final Label uiId = new Label(String.valueOf(getUIId()));
+        uiId.setId(UIID_ID);
+        layout.addComponent(uiId);
 
         Button closeBtn = new Button("close UI");
         closeBtn.setId(CLOSE_BTN_ID);
@@ -95,12 +101,18 @@ public class DestroyUI extends UI {
     public static class UIScopedBean implements Serializable {
         public static final String DESTROY_COUNT = "uibeandestroycount";
 
+        int uiId;
+
         @Inject
         Counter counter;
 
         @PreDestroy
         public void destroy() {
-            counter.increment(DESTROY_COUNT);
+            counter.increment(DESTROY_COUNT + uiId);
+        }
+
+        public void setUiId(int uiId) {
+            this.uiId = uiId;
         }
     }
 

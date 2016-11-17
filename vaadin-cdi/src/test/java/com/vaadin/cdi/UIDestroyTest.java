@@ -16,6 +16,7 @@ import static org.junit.Assert.assertThat;
 public class UIDestroyTest extends AbstractManagedCDIIntegrationTest {
 
     private String uri;
+    private String uiId;
 
     @Deployment(testable = false)
     public static WebArchive deployment() {
@@ -28,9 +29,8 @@ public class UIDestroyTest extends AbstractManagedCDIIntegrationTest {
     public void setUp() throws IOException {
         resetCounts();
         uri = Conventions.deriveMappingForUI(DestroyUI.class);
-        firstWindow.manage().deleteAllCookies();//ensure test starts in a new session
-
         openWindow(uri);
+        uiId = findElement(DestroyUI.UIID_ID).getText();
         assertDestroyCount(0);
     }
 
@@ -59,8 +59,8 @@ public class UIDestroyTest extends AbstractManagedCDIIntegrationTest {
     }
 
     private void assertDestroyCount(int count) throws IOException {
-        assertThat(getCount(DestroyUI.DESTROY_COUNT), is(count));
-        assertThat(getCount(DestroyUI.UIScopedBean.DESTROY_COUNT), is(count));
+        assertThat(getCount(DestroyUI.DESTROY_COUNT + uiId), is(count));
+        assertThat(getCount(DestroyUI.UIScopedBean.DESTROY_COUNT + uiId), is(count));
     }
 
 }
